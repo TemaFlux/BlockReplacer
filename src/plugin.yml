@@ -1,0 +1,6 @@
+name: BlockReplacer
+main: me.temaflex.blockreplacer.Main
+author: TemaFlux
+version: 1.0
+commands:
+    blockreplacer:
