@@ -46,6 +46,7 @@ extends JavaPlugin {
             replaceblocks.clear();
         }
         for (String key : getConfig().getKeys(false)) {
+        	if (key.equals("messages")) continue;
             String value = getConfig().getString(key);
             XMaterial replacer = Utils.parseMaterial(key);
             XMaterial puted = Utils.parseMaterial(value);
