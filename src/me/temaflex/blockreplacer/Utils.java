@@ -4,11 +4,18 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 
+import me.temaflex.blockreplacer.api.IDLibrary;
+import me.temaflex.blockreplacer.api.MinecraftVersion;
+import me.temaflex.blockreplacer.api.MinecraftVersion.V;
+import me.temaflex.blockreplacer.api.XMaterial;
 import net.md_5.bungee.api.ChatColor;
 
 public class Utils {
+    private static IDLibrary idlibrary;
+    
     public static XMaterial parseMaterial(String name) {
         XMaterial material = XMaterial.AIR;
         String[] xx = name.split(":");
@@ -17,23 +24,43 @@ public class Utils {
         if (xx.length > 1) {
             durability = xx[1];
         }
-        if (isInteger(id)) {
-            try {
-                id = Material.values()[Integer.valueOf(id)].name();
+        if (!MinecraftVersion.atLeast(V.v1_13)) {
+            if (isInteger(id)) {
+                try {
+                    id = Material.values()[Integer.valueOf(id)].name();
+                }
+                catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {}
             }
-            catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {}
-        }
-        try {
-            material = XMaterial.matchXMaterial(id+":"+durability).get();
-        }
-        catch (Exception e) {
-            if (e instanceof NoSuchElementException || e instanceof NumberFormatException) {
-                if (!durability.equals("0")) {
-                    material = XMaterial.matchXMaterial(id+":0").get();
+            try {
+                material = XMaterial.matchXMaterial(id+":"+durability).get();
+            }
+            catch (Exception e) {
+                if (e instanceof NoSuchElementException || e instanceof NumberFormatException) {
+                    if (!durability.equals("0")) {
+                        material = XMaterial.matchXMaterial(id+":0").get();
+                    }
                 }
             }
         }
+        else {
+            if (idlibrary == null) {
+                idlibrary = new IDLibrary();
+            }
+            material = XMaterial.matchXMaterial(idlibrary.getMaterial(id+":"+durability));
+        }
         return material;
+    }
+    
+    @SuppressWarnings("deprecation")
+    public static XMaterial BlocktoXMaterial(Block b) {
+        XMaterial placed_m = null;
+        try {
+            placed_m = XMaterial.matchXMaterial(b.getType().name()+":"+b.getState().getRawData()).get();
+        }
+        catch (NoSuchElementException ex) {
+            placed_m = XMaterial.matchXMaterial(b.getType().name()+":0").get();
+        }
+        return placed_m;
     }
     
     public static boolean isInteger(String s) {
@@ -52,7 +79,7 @@ public class Utils {
         return true;
     }
     
-    public static void sendM(CommandSender sender, Object msg, String cmd) {
+    public static void sendMessage(CommandSender sender, Object msg, String cmd) {
         if (msg instanceof List) {
             for (Object str : ((List<?>)msg)) {
                 String out = String.valueOf(str).replace("{cmd}", cmd);

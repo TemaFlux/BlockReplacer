@@ -20,7 +20,7 @@
  * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package me.temaflex.blockreplacer;
+package me.temaflex.blockreplacer.api;
 
 import com.google.common.base.Enums;
 import com.google.common.cache.Cache;
@@ -1266,9 +1266,9 @@ public enum XMaterial {
      * @since 3.0.0
      */
     private static final EnumMap<XMaterial, XMaterial> DUPLICATED = new EnumMap<XMaterial, XMaterial>(XMaterial.class) {
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	{
+    {
         put(MELON, MELON_SLICE);
         put(CARROT, CARROTS);
         put(POTATO, POTATOES);

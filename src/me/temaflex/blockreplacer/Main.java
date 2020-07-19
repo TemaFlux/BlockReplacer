@@ -5,29 +5,31 @@ import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import me.temaflex.blockreplacer.api.XMaterial;
+import me.temaflex.blockreplacer.commands.BlockReplacer;
+import me.temaflex.blockreplacer.listeners.BlockPlaceListener;
 
 public class Main
 extends JavaPlugin {
     private static Main instance;
     FileConfiguration config;
-    Cmd Cmd = new Cmd();
-    Events Events = new Events();
-    private static HashMap<XMaterial, XMaterial> replaceblocks = new HashMap<XMaterial, XMaterial>();
+    BlockReplacer BlockReplacer = new BlockReplacer();
+    private static HashMap<XMaterial, XMaterial> ReplaceBlocks = new HashMap<XMaterial, XMaterial>();
     
     @Override
     public void onEnable() {
         instance = this;
         loadConfig();
-        getServer().getPluginManager().registerEvents(Events, this);
-        getCommand("blockreplacer").setExecutor(Cmd);
+        registerListeners(new BlockPlaceListener());
+        getCommand("blockreplacer").setExecutor(BlockReplacer);
     }
     
     @Override
     public void onDisable() {
-        if (Events != null) {
-            HandlerList.unregisterAll(Events);
-        }
+        super.onDisable();
         HandlerList.unregisterAll(this);
     }
     
@@ -37,28 +39,34 @@ extends JavaPlugin {
         }
         File file = new File(this.getDataFolder(), "config.yml");
         if (file.exists()) {
-            config = this.getConfig();
+        	config = this.getConfig();
         } else {
             this.saveDefaultConfig();
             config = this.getConfig();
         }
-        if (!replaceblocks.isEmpty()) {
-            replaceblocks.clear();
+        if (!ReplaceBlocks.isEmpty()) {
+            ReplaceBlocks.clear();
         }
         for (String key : getConfig().getKeys(false)) {
-        	if (key.equals("messages")) continue;
+            if (key.equals("messages")) continue;
             String value = getConfig().getString(key);
             XMaterial replacer = Utils.parseMaterial(key);
             XMaterial puted = Utils.parseMaterial(value);
-            replaceblocks.put(replacer, puted);
+            ReplaceBlocks.put(replacer, puted);
         }
     }
     
     public static HashMap<XMaterial, XMaterial> getReplaceBlocks() {
-        return replaceblocks;
+        return ReplaceBlocks;
     }
     
-    public static Main getI() {
+    public static Main getInstance() {
         return instance;
+    }
+    
+    public void registerListeners(Listener... listener) {
+        for (Listener l : listener) {
+            this.getServer().getPluginManager().registerEvents(l, this);
+        }
     }
 }
