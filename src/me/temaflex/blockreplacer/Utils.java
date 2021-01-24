@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
 
 import me.temaflex.blockreplacer.api.IDLibrary;
 import me.temaflex.blockreplacer.api.MinecraftVersion;
@@ -16,28 +17,48 @@ import net.md_5.bungee.api.ChatColor;
 public class Utils {
     private static IDLibrary idlibrary;
     
-    public static XMaterial parseMaterial(String name) {
-        XMaterial material = XMaterial.AIR;
+    @SuppressWarnings("deprecation")
+	public static XMaterial parseXMaterial(ItemStack i) {
+    	int mdurab = i.getType().getMaxDurability();
+    	int data = i.getDurability();
+    	if (mdurab > 0) data = 0;
+    	return parseXMaterial(i.getType().name(), data);
+    }
+    
+    @SuppressWarnings("deprecation")
+    public static XMaterial parseXMaterial(Block b) {
+        return parseXMaterial(b.getType().name(), b.getState().getRawData());
+    }
+    
+    public static XMaterial parseXMaterial(String name) {
         String[] xx = name.split(":");
         String id = xx[0];
-        String durability = "0";
+        byte data = 0;
         if (xx.length > 1) {
-            durability = xx[1];
+        	try {
+        		data = Byte.valueOf(xx[1]);
+        	}
+        	catch (Exception e) {}
         }
+    	return parseXMaterial(id, data);
+    }
+    
+    public static XMaterial parseXMaterial(String id, int data) {
+        XMaterial m = XMaterial.AIR;
         if (!MinecraftVersion.atLeast(V.v1_13)) {
             if (isInteger(id)) {
                 try {
                     id = Material.values()[Integer.valueOf(id)].name();
                 }
-                catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {}
+                catch (Exception e) {}
             }
             try {
-                material = XMaterial.matchXMaterial(id+":"+durability).get();
+                m = XMaterial.matchXMaterial(id+":"+data).get();
             }
             catch (Exception e) {
                 if (e instanceof NoSuchElementException || e instanceof NumberFormatException) {
-                    if (!durability.equals("0")) {
-                        material = XMaterial.matchXMaterial(id+":0").get();
+                    if (data != 0 ) {
+                        m = XMaterial.matchXMaterial(id).get();
                     }
                 }
             }
@@ -46,21 +67,12 @@ public class Utils {
             if (idlibrary == null) {
                 idlibrary = new IDLibrary();
             }
-            material = XMaterial.matchXMaterial(idlibrary.getMaterial(id+":"+durability));
+            try {
+            	m = XMaterial.matchXMaterial(idlibrary.getMaterial(id+":"+data));
+            }
+            catch (Exception e) {}
         }
-        return material;
-    }
-    
-    @SuppressWarnings("deprecation")
-    public static XMaterial BlocktoXMaterial(Block b) {
-        XMaterial placed_m = null;
-        try {
-            placed_m = XMaterial.matchXMaterial(b.getType().name()+":"+b.getState().getRawData()).get();
-        }
-        catch (NoSuchElementException ex) {
-            placed_m = XMaterial.matchXMaterial(b.getType().name()+":0").get();
-        }
-        return placed_m;
+        return m;
     }
     
     public static boolean isInteger(String s) {
@@ -81,7 +93,7 @@ public class Utils {
     
     public static void sendMessage(CommandSender sender, Object msg, String cmd) {
         if (msg instanceof List) {
-            for (Object str : ((List<?>)msg)) {
+            for (Object str : ((List<?>) msg)) {
                 String out = String.valueOf(str).replace("{cmd}", cmd);
                 sender.sendMessage(parseColor(out));
             }

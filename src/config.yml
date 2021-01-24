@@ -1,12 +1,21 @@
-#Право на перезагрузку плагина (blockreplacer.reload)
-#Сообщения
+# Право на перезагрузку плагина (blockreplacer.reload)
+# Настройки
+settings:
+    disable:
+        listeners: false
+        command: false
+    enable:
+        BlockPlace: true
+        DropItem: false
+        DropBlock: false
+# Сообщения
 messages:
     help:
     - "&8- &7/{cmd} &freload - Перезагрузка плагина"
     reload: "Плагин был перезагружен."
     noperm: "&cУ вас не достаточно прав!"
-#ID(С которого заменить): (Который будет поставлен)
-#STONE: GRASS
-#"1": "2"
+# ID(С которого заменить): (Который будет поставлен)
+# STONE: GRASS
+# "1": "2"
 "1": "2"
 "STONE:3": "1:6"
