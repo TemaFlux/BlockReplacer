@@ -20,7 +20,7 @@ implements Listener {
         XMaterial placed_m = Utils.BlocktoXMaterial(b);
         if (Main.getReplaceBlocks().containsKey(placed_m) && placed_m != XMaterial.AIR) {
             XMaterial x = Main.getReplaceBlocks().get(placed_m);
-            b.setType(x.parseMaterial(true).get());
+            b.setType(x.parseMaterial());
             BlockState state = b.getState();
             state.setRawData(x.getData());
             state.update(true);

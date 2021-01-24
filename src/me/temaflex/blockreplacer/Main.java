@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.temaflex.blockreplacer.api.XMaterial;
-import me.temaflex.blockreplacer.commands.BlockReplacer;
+import me.temaflex.blockreplacer.cmds.BlockReplacer;
 import me.temaflex.blockreplacer.listeners.BlockPlaceListener;
 
 public class Main
@@ -29,8 +29,8 @@ extends JavaPlugin {
     
     @Override
     public void onDisable() {
-        super.onDisable();
         HandlerList.unregisterAll(this);
+        super.onDisable();
     }
     
     public void loadConfig() {

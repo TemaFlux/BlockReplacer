@@ -1,4 +1,4 @@
-package me.temaflex.blockreplacer.commands;
+package me.temaflex.blockreplacer.cmds;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,11 +9,10 @@ import me.temaflex.blockreplacer.Utils;
 
 public class BlockReplacer
 implements CommandExecutor {
-    Main main = Main.getInstance();
-    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (args.length >= 1) {
+    	Main main = Main.getInstance();
+        if (args.length > 0) {
             if (args[0].equalsIgnoreCase("reload")) {
                 if (sender.hasPermission("blockreplacer.reload")) {
                     main.reloadConfig();
