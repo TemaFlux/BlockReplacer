@@ -1,4 +1,6 @@
 # Право на перезагрузку плагина (blockreplacer.reload)
+# Версия кфг (Для понимания который вы кфг используете)
+config-version: 1
 # Настройки
 settings:
     disable:

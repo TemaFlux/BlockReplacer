@@ -1,6 +1,7 @@
 package me.temaflex.blockreplacer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.io.Files;
 
 import me.temaflex.blockreplacer.api.XMaterial;
 import me.temaflex.blockreplacer.cmds.BlockReplacer;
@@ -28,6 +31,8 @@ extends JavaPlugin {
     public boolean e_blockplace = true;
     public boolean e_dropitem = false;
     public boolean e_dropblock = false;
+    //
+    public int cfg_version = -1;
     
     @Override
     public void onEnable() {
@@ -54,6 +59,37 @@ extends JavaPlugin {
             this.saveDefaultConfig();
             this.config = this.getConfig();
         }
+        // Cfg version
+        this.cfg_version = this.getConfig().getInt("config-version", 0);
+        if (this.cfg_version == 0) {
+        	HashMap<String, String> replacers = new HashMap<String, String>();
+        	for (String key : this.getConfig().getKeys(false)) {
+                if (key.equals("messages") || key.equals("settings")) continue;
+                String value = this.getConfig().getString(key);
+                replacers.put(key, value);
+            }
+        	// Rename File
+        	try {
+        	    Files.move(file, new File(this.getDataFolder(), "config_" + System.currentTimeMillis() + ".yml"));
+        	} catch (Exception e) {
+        	    e.printStackTrace();
+        	}
+        	// Load new cfg
+        	this.saveDefaultConfig();
+            this.config = this.getConfig();
+            for (String key : replacers.keySet()) {
+                for (String key_b : this.getConfig().getKeys(false)) {
+                    if (key_b.equals("messages") || key.equals("settings")) continue;
+                    this.getConfig().set(key_b, null);
+                }
+                this.getConfig().set(key, replacers.get(key));
+            }
+            try {
+				this.config.save(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
         // Settings
         // Disable
         this.d_listeners = this.getSetting("disable.listeners", false);
@@ -64,9 +100,9 @@ extends JavaPlugin {
         this.e_dropblock = this.getSetting("enable.DropBlock", false);
         // Blocks
         if (!ReplaceBlocks.isEmpty()) ReplaceBlocks.clear();
-        for (String key : getConfig().getKeys(false)) {
+        for (String key : this.getConfig().getKeys(false)) {
             if (key.equals("messages") || key.equals("settings")) continue;
-            String value = getConfig().getString(key);
+            String value = this.getConfig().getString(key);
             try {
 	            XMaterial replacer = Utils.parseXMaterial(key);
 	            XMaterial puted = Utils.parseXMaterial(value);
